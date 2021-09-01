@@ -77,7 +77,7 @@ def plot_embeddings_neighbours(
     neighbours_embeddings = []
     for tgt_embeddings in list_tgt_embeddings:
         for embedding in list_embedding:
-            similarities,neighbours  = tgt_embeddings.getNearestNeighbours(embedding,k,distance_function,csls_k)
+            similarities,neighbours  = tgt_embeddings.get_nearest_neighbours(embedding,k,distance_function,csls_k)
             neighbours_embeddings =  neighbours_embeddings + neighbours
             topic = topic + ([embedding.word] * len(neighbours) )
             lang = lang + ([tgt_embeddings.lang] * len(neighbours))

@@ -2,6 +2,8 @@ from typing import Tuple
 import numpy as np
 import faiss
 
+# https://samnicholls.net/2016/06/15/how-to-sphinx-readthedocs/
+
 class Embedding:
     def __init__(self,lang,dim,word,id,vector,embeddings):
         self.lang =lang
@@ -12,14 +14,28 @@ class Embedding:
         # Used to reference parents
         self.embeddings =embeddings
     
-    def __str__(self):
-        return self.word + " , " + self.lang
 
     def compare_cosine(self,target_embedding):
+        """Compare and return cosine similarity from two Embedding object
+
+        :param target_embedding (Embedding): Embedding object that will be compared
+
+        Returns:
+            np.int64: Similarity that are measured using cosine. Returned values will range from 0 to 1
+        
+        """
         return np.dot( self.vector,target_embedding.vector)
     
     
     def compare_csls(self,target_embedding,csls_k):
+        """Compare and return cosine similarity from two Embedding object
+
+        :param target_embedding (Embedding): Embedding object that will be compared.
+        :param csls_k (int, optional): Number of neighbours that will be used for CSLS mean similarity. Defaults to 10.
+        Returns:
+            np.int64: Similarity that are measured using cosine. Returned values will range from -2 to 2
+        
+        """
         src= self.embeddings
         tgt= target_embedding.embeddings
 
@@ -34,16 +50,24 @@ class Embedding:
 # tetap pakai class embeddings
 #  bedanya waktu get nearest neighbours lempar object embedding
 class Embeddings:
-    def __init__(self,lang,dim):
+    
+    def __init__(self,lang,dim,cuda):
         self.lang =lang
         self.dim= dim
+        self.cuda =cuda
         self.word2id = {}
         self.id2word= []
-        self.vector = []
-        
+        self.embeddings_matrix = []
         self.mean_similarity = {}
     
+
     def build_faiss_index(self,cuda=False):
+        """This function build faiss index, for searching fast nearest neighbour by using ANN (Approximation Nearest Neighbours)
+        
+        Args:
+            cuda (bool, optional): Use GPU or not for indexing Defaults to False.
+        
+        """
         if cuda==False:
             self.embedding_index = faiss.IndexFlatIP(self.dim)
         else:
@@ -51,10 +75,19 @@ class Embeddings:
             config = faiss.GpuIndexFlatConfig()
             config.device = 0
             index = faiss.GpuIndexFlatIP(res, self.dim, config)
-        self.embedding_index.add( np.asarray(self.vector).astype(np.float32) )
+        self.embedding_index.add( np.asarray(self.embeddings_matrix).astype(np.float32) )
 
 
-    def load_embeddings(self,path,lang,ext='txt',max_vocab=10000):
+    def load_embeddings(self,path:str,lang:str,ext='txt',max_vocab=10000):
+        """This function are used to load word embeddings,currently only txt formats are supported
+
+        Args:
+            path (str): Path to the word embeddings file.
+            lang (str): Word embeddings language.
+            ext (str, optional): File formats, currently only support txt.
+            max_vocab (int, optional): Maximum word embedding to load defaults to 10000.
+        
+        """
         available_ext = ['txt','pck']
         assert(ext in available_ext)
         if ext=='txt':
@@ -64,7 +97,15 @@ class Embeddings:
         # TODO implements load txt and ppth
     
     def load_txt(self,path,lang,max_vocab):
-        if len(self.vector) !=0:
+        """This function are used to load word embeddings that are using text-file format
+
+        Args:
+            path (str): Path to the word embeddings file
+            lang (str): Word embeddings language
+            max_vocab (int, optional): Maximum word embedding to load defaults to 10000.
+        
+        """
+        if len(self.embeddings_matrix) !=0:
             print("Embeddings already exists, create new object instead changing old ones")
             return
         self.lang=lang
@@ -78,24 +119,57 @@ class Embeddings:
                     continue
                 self.id2word.append(word)
                 self.word2id[word] = len(self.word2id)
-                self.vector.append(embedding)
+                self.embeddings_matrix.append(embedding)
                 if len(self.id2word) >= max_vocab:
                     break
-        self.vector= np.array(self.vector)
-        self.vector = self.vector / np.linalg.norm(self.vector,ord=2,axis=1,keepdims=True)
-        self.build_faiss_index()
+        self.embeddings_matrix= np.array(self.embeddings_matrix)
+        self.embeddings_matrix = self.embeddings_matrix / np.linalg.norm(self.embeddings_matrix,ord=2,axis=1,keepdims=True)
+        self.build_faiss_index(self.cuda)
     
-    def getEmbeddingById(self,id:int)->Embedding:
-        embedding = Embedding(id=id,word = self.id2word[id], dim=self.dim,vector=self.vector[id] ,lang=self.lang,embeddings=self)
+    def get_embedding_by_id(self,id:int)->Embedding:
+        """Get embedding object by id
+
+        Args:
+            id (int): Embedding id
+
+        Returns:
+            Embedding: Associated Embedding Object
+        
+        """
+        embedding = Embedding(id=id,word = self.id2word[id], dim=self.dim,vector=self.embeddings_matrix[id] ,lang=self.lang,embeddings=self)
         return embedding
 
-    def getEmbeddingByWord(self,word:str)->Embedding:
+    def get_embedding_by_word(self,word:str)->Embedding:
+        """Get embedding object by word
+
+        Args:
+            word (str): Embedding word
+
+        Returns:
+            Embedding: Associated Embedding Object
+        
+        """
         id = self.word2id[word]
-        embedding = Embedding(id=id,word = word, dim=self.dim,vector=self.vector[id] ,lang=self.lang,embeddings=self)
+        embedding = Embedding(id=id,word = word, dim=self.dim,vector=self.embeddings_matrix[id] ,lang=self.lang,embeddings=self)
         return embedding
 
         
-    def getNearestNeighbours(self,embedding : Embedding,k=5,distance_function='cosine',csls_k=10) -> Tuple[list[np.int64],list[Embedding]]:
+    def get_nearest_neighbours(self,embedding : Embedding,k=5,distance_function='cosine',csls_k=10) -> Tuple[list[np.int64],list[Embedding]]:
+        """This function are used to get nearest neighbour from the monolingual or cross-lingual Embeddings. There are two distance function currently supported, cosine and cross-domain local similarity scaling
+        
+        Args:
+            embedding (Embedding): Embedding that will be used as query
+            k (int, optional): Number of neighbours returned. Defaults to 5.
+            distance_function (str, optional): Distance function that will be used to measure two different embedding vectors. csls or cosine(Default). 
+            csls_k (int, optional): Number of neighbours that will be used for CSLS mean similarity. Defaults to 10.
+        
+        Raises:
+            ValueError: CSLS different values
+        
+        Returns:
+            Tuple[list[np.int64],list[Embedding]]: [Return list of the similarities and the neighbours embedding]
+        
+        """
         if distance_function=='cosine':
             similarities, indices = self.get_neighbours_cosine(embedding,k=5)
         elif distance_function=='csls':
@@ -105,14 +179,33 @@ class Embeddings:
             similarities, indices = self.get_neighbours_csls(embedding,k=5,csls_k=csls_k)
             
         # faiss returns an 2d array instead 1
-        embedding_list  = list(map(lambda index :  self.getEmbeddingById(index), indices))
+        embedding_list  = list(map(lambda index :  self.get_embedding_by_id(index), indices))
         return similarities,embedding_list
 
     def get_neighbours_cosine(self,embedding : Embedding,k=5 )-> Tuple[list[np.float32],list[np.int64]]:
+        """This function are used to get nearest neighbour from the monolingual or cross-lingual Embeddings by using cosine similarity
+
+        Args:
+            embedding (Embedding): Embedding that will be used as query
+            k (int, optional): Number of neighbours returned. Defaults to 5.
+            
+
+        Returns:
+            Tuple[list[np.int64],list[int]]: [Return list of the similarities and the neighbours index]
+        
+        """
         similarities, indices = self.embedding_index.search(np.array([embedding.vector]).astype(np.float32), k) # sanity check
         return similarities[0],indices[0]
 
     def build_mean_similarity(self,src,tgt,csls_k=10):
+        """This function are used to build the CSLS mean similarity in source and target space 
+
+        Args:
+            src (Embeddings): Source word embeddings
+            tgt (Embeddings): Target word embeddings
+            csls_k (int, optional): Number of neighbours that will be used for CSLS mean similarity. Defaults to 10.
+        
+        """
         src_dict = src.lang + f"top_k_{csls_k}"
         tgt_dict = tgt.lang + f"top_k_{csls_k}"
         # tgt->src
@@ -128,6 +221,17 @@ class Embeddings:
         
 
     def get_neighbours_csls(self,embedding:Embedding,k=5,csls_k=10):
+        """This function are used to get nearest neighbour from the monolingual or cross-lingual Embeddings by using cross-domain local similarity scaling
+
+        Args:
+            embedding (Embedding): Embedding that will be used as query
+            k (int, optional): Number of neighbours returned. Defaults to 5.
+            
+
+        Returns:
+            Tuple[list[np.int64],list[int]]: [Return list of the similarities and the neighbours index]
+        
+        """
         src= self
         tgt= embedding.embeddings
 
@@ -135,7 +239,7 @@ class Embeddings:
 
         scores=[]
         for src_word in src.id2word:
-            vec_src= src.getEmbeddingByWord(src_word).vector
+            vec_src= src.get_embedding_by_word(src_word).vector
             vec_tgt = embedding.vector
             cosine_source_target = np.dot(vec_src,vec_tgt)
             csls = (cosine_source_target*2) - src.get_mean_similarity_by_word(src_word,embedding.lang,csls_k) - tgt.get_mean_similarity_by_word(embedding.word,self.lang,csls_k)
@@ -145,25 +249,36 @@ class Embeddings:
         return scores[top_k_csls], top_k_csls
 
 
-        # Return CSLS formula
-    def get_mean_similarity_by_word(self,word,lang,csls_k):        
+    def get_mean_similarity_by_word(self,word,lang,csls_k):
+        """This function are used to get the mean similarity value by embedding word
+
+        Args:
+            word (str): Embedding word
+            lang (str): Target language
+            csls_k (int, optional): Number of neighbours that will be used for CSLS mean similarity. Defaults to 10.
+
+        Returns:
+            np.int64: Return the mean similarity associated embedding
+        
+        """
         dict = lang + f"top_k_{csls_k}"
         id = self.word2id[word]
         return self.mean_similarity[dict][id]
     
     def get_mean_similarity_by_id(self,id,lang,csls_k):
+        """This function are used to get the mean similarity value by embedding id
+
+        Args:
+            id (int): Embedding Id
+            lang (str): Target Language
+            csls_k (int, optional): Number of neighbours that will be used for CSLS mean similarity. Defaults to 10.
+
+        Returns:
+            np.int64: Return the mean similarity associated embedding
+        
+        """
         dict = lang + f"top_k_{csls_k}"
         return self.mean_similarity[dict][id]
-    
-    # def transform_embeddings(self,mapping_matrix : MappingMatrix):
-    #     self.vector = self.vector @ mapping_matrix.transformation_matrix
-    
-    # def get_cross
 
-    # def get_nearest_neighbour(self,keyword,k=5):
-    #     pass
-
-    # def get_cross_domain_neighbour(self,keyword,k=5):
-    #     pass
 
     

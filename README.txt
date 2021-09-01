@@ -4,4 +4,3 @@ Requirements
 - Numpy
 - PyTorch
 - Faiss
-asd
