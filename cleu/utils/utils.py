@@ -35,7 +35,7 @@ def reduce_dimensionality_2d(embedding_matrix, dimensionality_reduction='umap'):
 
 
 def combine_embeddings_matrix(list_embeddings:list[Embeddings]):
-    combine_matrix = map(lambda embeddings : embeddings.vector,list_embeddings)
+    combine_matrix = map(lambda embeddings : embeddings.embeddings_matrix,list_embeddings)
     embeddings_matrix = np.vstack(combine_matrix)
     return embeddings_matrix
 
