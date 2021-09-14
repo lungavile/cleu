@@ -2,7 +2,7 @@
 from distutils.core import setup
 setup(
   name = 'cleu',         # How you named your package folder (MyLib)
-  packages = ['cleu'],   # Chose the same as "name"
+  packages = ['cleu','cleu.plot','cleu.utils'],   # Chose the same as "name"
   version = '0.4',      # Start with a small number and increase it with every change you make
   license='MIT',        # Chose a license from here: https://help.github.com/articles/licensing-a-repository
   description = 'CLEU is a a high-level easy to use python library that can be used to analyze cross-lingual word embeddings on multiple languages, In addition CLEU provide some interactive visualization, where users can explore the cross-lingual word embeddings on two or more languages.',   # Give a short description about your library

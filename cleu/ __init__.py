@@ -1,3 +1,3 @@
 from cleu import *
 from cleu.utils import *
-from cleu.plot import *
+from cleu.plot.plot_embeddings import *
