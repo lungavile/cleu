@@ -104,4 +104,4 @@ plot_embeddings.plot_embeddings_neighbours(emb_en,[clwe_id,clwe_es],width=800,he
 - Open bug reports and feature requests on GitHub issues.
 
 ## License
-CLEU is licensed under the Apache 2.0.
+CLEU is licensed under the MIT.
