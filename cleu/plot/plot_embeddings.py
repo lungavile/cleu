@@ -6,7 +6,7 @@ import altair as alt
 import pandas as pd
 import numpy as np
 
-def plot_confusion_similarity(list_embedding_src,list_embedding_tgt,distance_function='cosine',csls_k=5):
+def plot_similarity(list_embedding_src,list_embedding_tgt,distance_function='cosine',csls_k=5):
     assert(len(list_embedding_src) > 0 and len(list_embedding_tgt) >0)
     assert (len(list_embedding_src) == len(list_embedding_tgt))
 

@@ -77,8 +77,8 @@ words_en = ["eat","eating","drink","walk","hypothesis","cat","study","money","bo
 # Map each list of word to list of Embedding
 emb_id = list(map(lambda word : clwe_id.get_embedding_by_word(word) ,words_id))
 emb_en = list(map(lambda word : clwe_en.get_embedding_by_word(word) ,words_en))
-# plot_embeddings.plot_confusion_similarity(emb_id,emb_en,distance_function='csls',csls_k=3)
-plot_embeddings.plot_confusion_similarity(emb_id,emb_en,distance_function='cosine')
+# plot_embeddings.plot_similarity(emb_id,emb_en,distance_function='csls',csls_k=3)
+plot_embeddings.plot_similarity(emb_id,emb_en,distance_function='cosine')
 ```
 ![Similarity Matrix](./images/similarity.png)
 
