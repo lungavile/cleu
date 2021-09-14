@@ -64,3 +64,40 @@ neighbours_you_id = clwe_id.get_nearest_neighbours(emb_you,k=5,distance_function
 neighbours_you_id = clwe_id.get_nearest_neighbours(emb_you,k=5,distance_function='csls',csls_k=10)
 ```
 
+### Example: Plotting Module
+Import the plotting module
+```python
+from cleu.plot import plot_embeddings
+```
+
+Plot Similarity Matrix between List of Embedding in English and Indonesian word embeddings
+```python
+words_id = ["makan","memakan","minum","jalan","hipotesis","kucing","belajar","uang","obligasi"]
+words_en = ["eat","eating","drink","walk","hypothesis","cat","study","money","bonds"]
+# Map each list of word to list of Embedding
+emb_id = list(map(lambda word : clwe_id.get_embedding_by_word(word) ,words_id))
+emb_en = list(map(lambda word : clwe_en.get_embedding_by_word(word) ,words_en))
+# plot_embeddings.plot_confusion_similarity(emb_id,emb_en,distance_function='csls',csls_k=3)
+plot_embeddings.plot_confusion_similarity(emb_id,emb_en,distance_function='cosine')
+```
+![Similarity Matrix](./images/similarity_matrix.png)
+
+Reduce Dimensionality and plot English, Indonesian and Spanish cross-lingual word embeddings on 2d plane
+```python
+import altair as alt
+# If you have more than 5000 embedding, uncomment the line below 
+# alt.data_transformers.disable_max_rows()
+plot_embeddings.plot_embeddings_2d([clwe_en,clwe_id,clwe_es],width=800,height=500,dimensionality_reduction='umap')
+```
+
+![Plot Embeddings](./images/plot_2d.png)
+
+Find English words nearest neighbours in Indonesian and Spanish cross-lingual word embeddings and plot it on 2d plance
+```python
+words_en = ["hypothesis","cat","study","comic"]
+emb_en = list(map(lambda word : clwe_en.get_embedding_by_word(word) ,words_en))
+plot_embeddings.plot_embeddings_neighbours(emb_en,[clwe_id,clwe_es],width=800,height=500,dimensionality_reduction='umap',k=3,distance_function='csls',csls_k=10)
+```
+
+## License
+CLEU is licensed under the Apache 2.0.
