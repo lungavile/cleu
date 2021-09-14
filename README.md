@@ -80,7 +80,7 @@ emb_en = list(map(lambda word : clwe_en.get_embedding_by_word(word) ,words_en))
 # plot_embeddings.plot_confusion_similarity(emb_id,emb_en,distance_function='csls',csls_k=3)
 plot_embeddings.plot_confusion_similarity(emb_id,emb_en,distance_function='cosine')
 ```
-![Similarity Matrix](./images/similarity_matrix.png)
+![Similarity Matrix](./images/similarity.png)
 
 Reduce Dimensionality and plot English, Indonesian and Spanish cross-lingual word embeddings on 2d plane
 ```python
@@ -98,6 +98,10 @@ words_en = ["hypothesis","cat","study","comic"]
 emb_en = list(map(lambda word : clwe_en.get_embedding_by_word(word) ,words_en))
 plot_embeddings.plot_embeddings_neighbours(emb_en,[clwe_id,clwe_es],width=800,height=500,dimensionality_reduction='umap',k=3,distance_function='csls',csls_k=10)
 ```
+![Plot Neighbours](./images/plot_neighbours.png)
+
+## Support
+- Open bug reports and feature requests on GitHub issues.
 
 ## License
 CLEU is licensed under the Apache 2.0.
