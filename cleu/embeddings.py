@@ -171,12 +171,12 @@ class Embeddings:
         
         """
         if distance_function=='cosine':
-            similarities, indices = self.get_neighbours_cosine(embedding,k=5)
+            similarities, indices = self.get_neighbours_cosine(embedding,k=k)
         elif distance_function=='csls':
             if embedding.lang== self.lang:
                 print("CSLS is intended to works on different languages")
                 raise ValueError
-            similarities, indices = self.get_neighbours_csls(embedding,k=5,csls_k=csls_k)
+            similarities, indices = self.get_neighbours_csls(embedding,k=k,csls_k=csls_k)
             
         # faiss returns an 2d array instead 1
         embedding_list  = list(map(lambda index :  self.get_embedding_by_id(index), indices))
@@ -210,12 +210,12 @@ class Embeddings:
         tgt_dict = tgt.lang + f"top_k_{csls_k}"
         # tgt->src
         if src_dict not in tgt.mean_similarity:
-            tgt_src_similarities, tgt_src_indices = src.embedding_index.search(np.array(tgt.vector).astype(np.float32) , csls_k)
+            tgt_src_similarities, tgt_src_indices = src.embedding_index.search(np.array(tgt.embeddings_matrix).astype(np.float32) , csls_k)
             tgt_src_similarities= tgt_src_similarities.mean(1)
             tgt.mean_similarity[src_dict ] =  tgt_src_similarities
         # src->tgt
         if tgt_dict not in src.mean_similarity:
-            src_tgt_similarities, src_tgt_indices =  tgt.embedding_index.search(np.array(src.vector).astype(np.float32) , csls_k)
+            src_tgt_similarities, src_tgt_indices =  tgt.embedding_index.search(np.array(src.embeddings_matrix).astype(np.float32) , csls_k)
             src_tgt_similarities= src_tgt_similarities.mean(1)
             src.mean_similarity[tgt_dict] = src_tgt_similarities
         
