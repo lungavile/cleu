@@ -24,4 +24,43 @@ pip install cleu
 ```
 
 ## Example
-The code demonstrate how to use CLEU from loading embeddings, querying neighbours on different languages and visualizing the embeddings .
+The code demonstrate how to use CLEU from loading embeddings, querying neighbours on different languages and visualizing the embeddings.
+
+### Example: Loading the Embeddings
+Load cross-lingual word embeddings for English (en), Indonesian (id) and Spanish
+```python
+from cleu.embeddings import Embeddings
+
+clwe_en = Embeddings(dim=300,lang='en',cuda=False)
+clwe_en.load_embeddings('data/vectors-en.txt',lang='en',max_vocab=10000)
+
+clwe_id = Embeddings(dim=300,lang='id',cuda=False)
+clwe_id.load_embeddings('data/vectors-id.txt',lang='id',max_vocab=10000)
+
+
+clwe_es = Embeddings(dim=300,lang='es',cuda=False)
+clwe_es.load_embeddings('data/vectors-es.txt',lang='es',max_vocab=10000)
+```
+
+### Example: Accessing the Embeddings property
+Accessing the Embeddings, more property can be seen in Embedding Class
+```python
+# There are two ways to get the Embeddings, by word or id
+# emb_you = clwe_en.get_embedding_by_id(0)
+emb_you = clwe_en.get_embedding_by_word("you")
+print(emb_you.vector, emb_you.id)
+```
+
+### Example: Querying Nearest Neighbours Embeddings
+Find nearest neighbour of Embedding you (en) in English word embeddings
+```python
+neighbours_you_en = clwe_en.get_nearest_neighbours(emb_you,k=5,distance_function='cosine')
+neighbours_you_en = clwe_en.get_nearest_neighbours(emb_you,k=5,distance_function='csls',csls_k=10)
+```
+
+Find nearest neighbour of Embedding you (en) in Indonesian word embeddings
+```python
+neighbours_you_id = clwe_id.get_nearest_neighbours(emb_you,k=5,distance_function='cosine')
+neighbours_you_id = clwe_id.get_nearest_neighbours(emb_you,k=5,distance_function='csls',csls_k=10)
+```
+
