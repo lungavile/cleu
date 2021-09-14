@@ -3,8 +3,6 @@
 CLEU is a a high-level easy to use python library that can be used to analyze cross-lingual word embeddings on multiple languages, In addition CLEU provide some interactive visualization, where users can explore the cross-lingual word embeddings on two or more languages.
 
 
-Prophet is [open source software](https://code.facebook.com/projects/) released by Facebook's [Core Data Science team](https://research.fb.com/category/data-science/). It is available for download on [CRAN](https://cran.r-project.org/package=prophet) and [PyPI](https://pypi.python.org/pypi/prophet/).
-
 ## Requirements
 - altair==4.1.0
 - faiss==1.7.1.post2
