@@ -150,7 +150,7 @@ class Embeddings:
         return embedding
 
         
-    def get_nearest_neighbours(self,embedding : Embedding,k=5,distance_function='cosine',csls_k=10) -> Tuple[list[np.int64],list[Embedding]]:
+    def get_nearest_neighbours(self,embedding : Embedding,k=5,distance_function='cosine',csls_k=10):
         """This function are used to get nearest neighbour from the monolingual or cross-lingual Embeddings. There are two distance function currently supported, cosine and cross-domain local similarity scaling
         
         Args:
