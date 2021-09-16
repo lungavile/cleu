@@ -45,10 +45,6 @@ class Embedding:
             
         return csls
 
-
-
-# tetap pakai class embeddings
-#  bedanya waktu get nearest neighbours lempar object embedding
 class Embeddings:
     
     def __init__(self,lang,dim,cuda):
