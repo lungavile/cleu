@@ -7,7 +7,18 @@ from sklearn.decomposition import PCA
 from sklearn.manifold import TSNE
 
 
-def create_similarity_matrix(list_embedding_src :list[Embedding] ,list_embedding_tgt :list[Embedding],distance_function='cosine',csls_k=5):
+def create_similarity_matrix(list_embedding_src  ,list_embedding_tgt ,distance_function='cosine',csls_k=5):
+    """Return 2d array of similarity matrix
+
+    Args:
+        list_embedding_src (list[Embedding]): Source list embedding
+        list_embedding_tgt (list[Embedding]): Target list embedding
+        distance_function (str, optional): Distance similarity. Defaults to 'cosine'.
+        csls_k (int, optional): [description]. Defaults to 5.
+
+    Returns:
+        list[list[float]] : 2d array containing similarity 
+    """
     similarity_matrix =[]
     for src_embedding in list_embedding_src:
         similarity_matrix.append(list() )
@@ -34,20 +45,36 @@ def reduce_dimensionality_2d(embedding_matrix, dimensionality_reduction='umap'):
 
 
 
-def combine_embeddings_matrix(list_embeddings:list[Embeddings]):
+def combine_embeddings_matrix(list_embeddings):
+    """This function accept list of Embeddings object and return the combined embeddings matrix
+
+    Args:
+        list_embeddings (list[Embeddings]): List of Embeddings to combine
+    """
     combine_matrix = map(lambda embeddings : embeddings.embeddings_matrix,list_embeddings)
     embeddings_matrix = np.vstack(combine_matrix)
     return embeddings_matrix
 
 
-def combine_embeddings_language(list_embeddings:list[Embeddings]):
+def combine_embeddings_language(list_embeddings):
+    """This function accept list of Embeddings object and return the combined embeddings language
+
+    Args:
+        list_embeddings (list[Embeddings]): List of Embeddings to combine
+    """
     languages = []
     for embeddings in list_embeddings:
         languages =  languages + ([embeddings.lang] *len(embeddings.id2word) )
     return languages
 
 
-def combine_embeddings_word(list_embeddings:list[Embeddings]):
+def combine_embeddings_word(list_embeddings):
+
+    """This function accept list of Embeddings object and return the combined embeddings words
+
+    Args:
+        list_embeddings (list[Embeddings]): List of Embeddings to combine
+    """
     list_word =  []
     for embeddings in list_embeddings:
         list_word = list_word+ embeddings.id2word
