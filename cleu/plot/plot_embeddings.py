@@ -23,7 +23,16 @@ def plot_similarity(list_embedding_src,list_embedding_tgt,distance_function='cos
     ax.xaxis.set_ticks_position('top') 
     plt.show()
 
-def plot_embeddings_2d(list_embeddings:list[Embeddings],width,height,dimensionality_reduction='umap'):
+def plot_embeddings_2d(list_embeddings,width,height,dimensionality_reduction='umap'):
+    """Plot embeddings that are reduced to 2d
+
+    Args:
+        list_embeddings (list[Embeddings]): List of Embeddings to plot
+        width (int): Plot width
+        height (int): Plot height
+        dimensionality_reduction (str, optional): ('umap','pca,'tsne'). Defaults to 'umap'.
+
+    """
     assert(len(list_embeddings) >0)
     embeddings_matrix = utils.combine_embeddings_matrix(list_embeddings)
     list_word =  utils.combine_embeddings_word(list_embeddings)
@@ -62,8 +71,8 @@ def plot_embeddings_2d(list_embeddings:list[Embeddings],width,height,dimensional
     return plot
 
 def plot_embeddings_neighbours(
-    list_embedding:list[Embedding],
-    list_tgt_embeddings:list[Embeddings],
+    list_embedding,
+    list_tgt_embeddings,
     width,
     height,
     dimensionality_reduction='umap',
@@ -71,6 +80,18 @@ def plot_embeddings_neighbours(
     distance_function='cosine',
     csls_k=10
 ):
+    """Accept list of Embedding as query and plot its target nearest neighbours
+
+    Args:
+        list_embedding (list[Embedding]): List of Embedding as Query
+        list_tgt_embeddings (list[Embeddings]): List of Embeddings as Target
+        width (int): Plot width
+        height (int): Plot height
+        dimensionality_reduction (str, optional): ('umap','pca,'tsne'). Defaults to 'umap'.    
+        k (int, optional): Number of neighbours returned. Defaults to 5.
+        distance_function (str, optional): Distance function that will be used to measure two different embedding vectors. csls or cosine(Default). 
+        csls_k (int, optional): Number of neighbours that will be used for CSLS mean similarity. Defaults to 10.
+    """
     # assert((len(list_tgt_embeddings) >0), "Target Embeddings must not be empty")
     topic = []
     lang = []

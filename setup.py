@@ -3,13 +3,13 @@ from distutils.core import setup
 setup(
   name = 'cleu',         # How you named your package folder (MyLib)
   packages = ['cleu','cleu.plot','cleu.utils'],   # Chose the same as "name"
-  version = '0.7',      # Start with a small number and increase it with every change you make
+  version = '1.1',      # Start with a small number and increase it with every change you make
   license='MIT',        # Chose a license from here: https://help.github.com/articles/licensing-a-repository
   description = 'CLEU is a a high-level easy to use python library that can be used to analyze cross-lingual word embeddings on multiple languages, In addition CLEU provide some interactive visualization, where users can explore the cross-lingual word embeddings on two or more languages.',   # Give a short description about your library
   author = 'Lungavile',                   # Type in your name
   author_email = 'lungavile@gmail.com',      # Type in your E-Mail
   url = 'https://github.com/lungavile/cleu',   # Provide either the link to your github or to your website
-  download_url = 'https://github.com/lungavile/cleu/archive/refs/tags/v0.7.tar.gz',    # I explain this later on
+  download_url = 'https://github.com/lungavile/cleu/archive/refs/tags/v1.1.tar.gz',    # I explain this later on
   keywords = ['nlp', 'word embeddings', 'cross-lingual word embeddings', 'multilingual word embeddings','visualization'],   # Keywords that define your package best
   install_requires=[
         'altair==4.1.0',
