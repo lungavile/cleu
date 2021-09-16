@@ -178,7 +178,7 @@ class Embeddings:
         embedding_list  = list(map(lambda index :  self.get_embedding_by_id(index), indices))
         return similarities,embedding_list
 
-    def get_neighbours_cosine(self,embedding : Embedding,k=5 )-> Tuple[list[np.float32],list[np.int64]]:
+    def get_neighbours_cosine(self,embedding : Embedding,k=5 ):
         """This function are used to get nearest neighbour from the monolingual or cross-lingual Embeddings by using cosine similarity
 
         Args:
